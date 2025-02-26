@@ -50,13 +50,41 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        if self.root.is_none(){
+            let new_node = Box::new(TreeNode::new(value));
+            self.root = Some(new_node);
+            return;
+        }else{
+            self.root.as_mut().unwrap().insert_node(value);
+        }
     }
+    
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        if self.root.is_none(){
+            return false;
+        }
+        let mut cur_ptr = self.root.as_ref().unwrap();
+        loop{
+            if cur_ptr.value > value {
+                if let Some(ref right_ptr) = cur_ptr.right{ 
+                    cur_ptr = right_ptr;
+                }else{
+                    return false;
+                }
+            }else if cur_ptr.value < value{
+                if let Some(ref left_ptr) = cur_ptr.left{ //正确使用 &mut Box aka ref mut
+                    cur_ptr = left_ptr;
+                }else{
+                    let new_node = Some(Box::new(TreeNode::new(value)));
+                    return false;
+                }
+            }else{
+                return true;
+            }
+            
+        }
     }
 }
 
@@ -65,8 +93,22 @@ where
     T: Ord,
 {
     // Insert a node into the tree
-    fn insert(&mut self, value: T) {
-        //TODO
+    fn insert_node(&mut self, value: T) {
+        if self.value > value {
+            if let Some(ref mut right_ptr) = self.right{ //正确使用 &mut Box aka ref mut
+                right_ptr.insert_node(value);
+            }else{
+                let new_node = Some(Box::new(TreeNode::new(value)));
+                self.right = new_node;
+            }
+        }else if  self.value < value{
+            if let Some(ref mut left_ptr) = self.left{ //正确使用 &mut Box aka ref mut
+                left_ptr.insert_node(value);
+            }else{
+                let new_node = Some(Box::new(TreeNode::new(value)));
+                self.left = new_node;
+            }
+        }
     }
 }
 

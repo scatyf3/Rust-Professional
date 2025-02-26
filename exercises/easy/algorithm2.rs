@@ -15,7 +15,7 @@ struct Node<T> {
     prev: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T: Clone> Node<T> {
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -31,13 +31,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -72,9 +72,32 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn reverse(&mut self){
-		// TODO
-	}
+	
+    pub fn reverse(&mut self) {
+        if self.length == 0 {
+            return; // 空链表直接返回
+        }
+
+        let mut prev: Option<NonNull<Node<T>>> = None; // 初始化前一个节点为 None
+        let mut current = self.start; // 当前节点从链表的开始节点开始
+
+
+        // 这个是遍历链表的标准rust句式...
+        while let Some(cur_ptr) = current {
+            let next = unsafe { (*cur_ptr.as_ptr()).next }; // 保存下一个节点
+            unsafe {
+                // 反转当前节点的指针
+                (*cur_ptr.as_ptr()).next = prev; 
+                (*cur_ptr.as_ptr()).prev = next; 
+            }
+            prev = Some(cur_ptr); // 移动 prev 到当前节点
+            current = next; // 移动到下一个节点
+        }
+
+        // 反转完成后，更新 start 和 end
+        self.end = self.start; 
+        self.start = prev; 
+    }
 }
 
 impl<T> Display for LinkedList<T>

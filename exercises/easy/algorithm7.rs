@@ -3,6 +3,8 @@
 	This question requires you to use a stack to achieve a bracket match
 */
 
+use std::collections::HashMap;
+
 
 #[derive(Debug)]
 struct Stack<T> {
@@ -32,7 +34,9 @@ impl<T> Stack<T> {
 	}
 	fn pop(&mut self) -> Option<T> {
 		// TODO
-		None
+		let res = Some(self.data.remove(self.size-1));
+		self.size -= 1;
+		return res;
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
@@ -80,8 +84,7 @@ impl<T: Clone> Iterator for IntoIter<T> {
 		}
 	}
 }
-struct Iter<'a, T: 'a> {
-	stack: Vec<&'a T>,
+struct Iter<'a, T: 'a> {	stack: Vec<&'a T>,
 }
 impl<'a, T> Iterator for Iter<'a, T> {
 	type Item = &'a T;
@@ -101,8 +104,43 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 
 fn bracket_match(bracket: &str) -> bool
 {
-	//TODO
-	true
+	let mut map: HashMap<char, char> = HashMap::new();
+    map.insert(')', '(');
+    map.insert(']', '[');
+    map.insert('}', '{');
+	let mut stack = Stack::<char>::new();
+	for c in bracket.chars(){
+		//println!("{}", c);
+		if c =='(' || c=='['  || c =='{' {
+			//println!("push");
+			stack.push(c);
+		}
+		if c ==')' || c ==']' || c=='}'{
+			if let Some(prev) = stack.peek(){
+				if map[&c]==*prev{ 
+					stack.pop();
+					//println!("barcket match");
+				}else{
+					//println!("barcket not match");
+					return false;
+				}
+			}else{
+				//println!("peek is null");
+				return false;
+			}
+		}
+	}
+	//print!("{}", stack.len());
+	//for elem in stack.iter() {
+	//	print!("{}", elem);
+	//}
+
+	if stack.is_empty(){
+		return true;
+	}else{
+		return false;
+	}
+	
 }
 
 #[cfg(test)]

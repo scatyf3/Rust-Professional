@@ -4,9 +4,21 @@
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
 
+use std::mem::swap;
 
-fn sort<T>(array: &mut [T]){
-	//TODO
+// O(n^2)，不好
+fn sort<T: std::cmp::PartialOrd>(array: &mut [T]){
+    for _ in 0..array.len(){
+        let mut prev = 0;
+        for i in 1..array.len() {
+            if array[prev]>array[i]{
+                array.swap(i, prev);
+            }
+            prev = prev+1;
+        }
+    }
+	
+
 }
 #[cfg(test)]
 mod tests {

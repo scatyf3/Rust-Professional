@@ -14,7 +14,7 @@ struct Node<T> {
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T: std::cmp::PartialOrd + Clone + std::fmt::Debug> Node<T> {
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone + std::fmt::Debug> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: std::cmp::PartialOrd+ Clone + std::fmt::Debug> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -56,6 +56,7 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
+    // 感觉没有正确get到它给的接口的设计意图TT
     pub fn get(&mut self, index: i32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
@@ -69,14 +70,75 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    
+    // 不该这样，一个列表弄完之后，另外一个列表慢慢在loop中挪过来就行
+    pub fn remove_front(&mut self) {
+        unsafe {
+            // 确保 start 是 Some，并且可以安全地获取下一个节点
+            if let Some(start_ptr) = self.start {
+                let next_ptr = (*start_ptr.as_ptr()).next; // 获取下一个节点的指针
+                if let Some(next_node) = next_ptr {
+                    // 更新 start 为下一个节点的指针
+                    // new_unchecked创建一个not null
+                    self.start = Some(NonNull::new_unchecked(next_node.as_ptr()));
+                } else {
+                    // 如果没有下一个节点，设置 start 为 None
+                    self.start = None;
+                }
+            }
+        }
+    }
+
+
+	pub fn merge (mut list_a: LinkedList<T>,mut list_b: LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
+		let mut res = Self {
             length: 0,
             start: None,
             end: None,
+        };
+
+        loop {
+            match (list_a.get(0), list_b.get(0)) {
+                (Some(value_a), Some(value_b)) => {
+                    if value_a < value_b {
+                        println!("a{:?}", value_a);
+                        res.add((*value_a).clone());
+                        list_a.remove_front();
+                    } else {
+                        println!("b {:?}", value_b);
+                        res.add((*value_b).clone());
+                        list_b.remove_front();
+                    }
+                }
+                (Some(value_a), None) => {
+                    println!("case a");
+                    // res.add((*value_a).clone());
+                    // 将 list_a 剩余部分连接到 res
+                    if let Some(end_ptr) = res.end {
+                        unsafe {
+                            // TODO 从当前的节点连接
+                            (*end_ptr.as_ptr()).next = list_a.start;
+                        }
+                    } 
+                    break;
+                }
+                (None, Some(value_b)) => {
+                    println!("case b");
+                    // res.add((*value_b).clone());
+                    // 将 list_b 剩余部分连接到 res
+                    if let Some(end_ptr) = res.end {
+                        unsafe {
+                            (*end_ptr.as_ptr()).next = list_b.start; // 连接剩余的节点
+                        }
+                    } 
+                    break;
+                }
+                (None, None) => break, // 都为空，退出循环
+            }
         }
+        res
+        
 	}
 }
 
