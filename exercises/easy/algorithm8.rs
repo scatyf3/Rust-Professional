@@ -69,39 +69,46 @@ impl<T> myStack<T> {
         }
     }
     pub fn push(&mut self, elem: T) {
-        //TODO
-        if self.cur_queue == 1{
-            self.q1.enqueue(elem);
-        }else{
+        // push的时候调好顺序
+        if self.cur_queue==1{
             self.q2.enqueue(elem);
+            while !self.q1.is_empty() {
+                let cur_val = self.q1.dequeue();
+                if let Ok(value) = cur_val {
+                    self.q2.enqueue(value);
+                }
+            }
+            self.cur_queue=2;
+        }else{
+            self.q1.enqueue(elem);
+            while !self.q2.is_empty() {
+                let cur_val = self.q2.dequeue();
+                if let Ok(value) = cur_val {
+                    self.q1.enqueue(value);
+                }
+            }
+            self.cur_queue=1;
         }
     }
     pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-        if self.cur_queue == 1{
-            self.q1.enqueue(elem);
+        if self.cur_queue==1{
+            let res = self.q1.dequeue();
+            match res  {
+                Ok(value) => return Ok(value),
+                Err(e) => return Err("Stack is empty") // 需要修改报错信息
+            }
+            return res;
         }else{
-            self.q2.enqueue(elem);
+            let res = self.q2.dequeue();
+            match res  {
+                Ok(value) => return Ok(value),
+                Err(e) => return Err("Stack is empty") // 需要修改报错信息
+            }
         }
-		loop {
-            match self.q1.dequeue() {
-                Ok(value) => {
-                    self.q2.enqueue(value);
-                    if self.q1.size()==1{
-                        let res = self.q1.dequeue();
-                        return res;
-                    }
-                }
-                Err(error) => {
-                    return Err(error)
-                }
-            }   
-
-        }`
     }
     pub fn is_empty(&self) -> bool {
 		//TODO
-        true
+        return self.q1.is_empty() && self.q2.is_empty();
     }
 }
 

@@ -9,11 +9,26 @@
     Hint: You can modify the input array in place to track duplicates.
 */
 
-use std::fmt::{self, Display, Formatter};
+use std::{collections::HashSet, fmt::{self, Display, Formatter}};
 
 pub fn find_duplicates(nums: Vec<i32>) -> Vec<i32> {
     // TODO: Implement the logic to find all duplicates in the array
-    Vec::new() // Placeholder return value
+    let mut set = HashSet::<i32>::new();
+    let mut res = Vec::new();
+    for elem in nums{
+        if set.contains(&elem){
+            if !res.contains(&elem){
+                //println!("{}",elem);
+                res.push(elem);
+            }
+            
+        }else{
+            set.insert(elem);
+        }
+    }
+    res.sort();
+    return res;
+
 }
 
 #[cfg(test)]
