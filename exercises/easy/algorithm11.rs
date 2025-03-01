@@ -13,6 +13,7 @@
 
 use std::collections::HashSet;
 use std::fmt::{self, Display, Formatter};
+use std::convert::TryInto;
 
 pub fn find_missing_number(nums: Vec<i32>) -> i32 {
     // TODO: Implement the logic to find the missing number

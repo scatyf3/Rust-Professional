@@ -24,7 +24,7 @@ pub fn is_palindrome(s: String) -> bool {
     let a = clean_string(&s);
     let c:Vec<char> = a.chars().collect();// rust中字符串/char都无法索引，只能变成vector
     println!("{}", a);
-    let mut l:usize = 0.try_into().unwrap();
+    let mut l:usize = 0;
     let mut r = a.len()-1;
     println!("{}",r);
     

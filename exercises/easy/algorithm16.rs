@@ -13,6 +13,24 @@ use std::fmt::{self, Display, Formatter};
 
 pub fn rotate_matrix_90_degrees(matrix: &mut Vec<Vec<i32>>) {
     // TODO: Implement the logic to rotate the matrix 90 degrees in place
+    // 复习: index关系应该是 new_matrix[j][size - 1 - i] = matrix[i][j]; // 旋转位置
+    // 但我懒，而且这题也不保证是方阵
+    let len = matrix[0].len();
+    let size = matrix.len();
+    for i in 0..len{
+        let mut new_row_vec = Vec::<i32>::new();
+        for j in 0..size{
+            let j = size-j-1;
+            new_row_vec.push(matrix[j][i]);
+        }
+        for elem in &new_row_vec{
+            print!("{} ",*elem);
+        }
+        matrix.push(new_row_vec);
+    }
+    for _ in 0..size{
+        matrix.remove(0);
+    }
 }
 
 #[cfg(test)]

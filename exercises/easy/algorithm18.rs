@@ -11,11 +11,37 @@
     Hint: You can start by sorting the intervals by their starting point and then merge them one by one.
 */
 
+// NOT Finish
 use std::fmt::{self, Display, Formatter};
 
-pub fn merge_intervals(intervals: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
-    // TODO: Implement the logic to merge overlapping intervals
-    Vec::new() // Placeholder return value
+fn is_overlap(interval1: &Vec<i32>, interval2: &Vec<i32>) -> bool {
+    interval1[1] >= interval2[0] && interval2[1] >= interval1[0] // 检查重叠
+}
+
+fn merge(interval1: Vec<i32>, interval2: Vec<i32>) -> Vec<i32> {
+    vec![interval1[0].min(interval2[0]), interval1[1].max(interval2[1])] // 合并区间
+}
+
+pub fn merge_intervals(mut intervals: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    intervals.sort_by_key(|interval| interval[0]); 
+    let mut res: Vec<Vec<i32>> = vec![];
+
+    for interval in intervals {
+        if res.is_empty() {
+            res.push(interval);
+        } else {
+            let last_interval = res.last().unwrap(); // 获取最后一个区间
+            if is_overlap(&interval, last_interval) {
+                // 如果重叠，合并区间
+                let merged_interval = merge(interval, last_interval.clone());
+                res.pop(); // 移除最后一个区间
+                res.push(merged_interval); // 添加合并后的区间
+            } else {
+                res.push(interval); // 无重叠，直接添加
+            }
+        }
+    }
+    res
 }
 
 #[cfg(test)]
